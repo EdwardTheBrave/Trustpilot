@@ -6,7 +6,7 @@ Algunos datos (los mínimos necesarios) han sido suprimidos por motivos de confi
 
 Todo el ejercicio se desarrolla dentro de la máquina virtual de Cloudera CDH 5, no obstante, si se dispone de las herramientas necesarias se podrá ejecutar en cualquier entorno real de Big Data.
 
-**¡Comencemos!
+**¡Comencemos!**
 
 Herramientas y software que necesitaremos:
 
@@ -20,7 +20,7 @@ Primero, un poco de configuración básica de la máquina de la mano de @dvillaj
 
 ## Configuración Previa
 
-** Instalación de Python
+**Instalación de Python**
 
 
 ````
@@ -41,7 +41,7 @@ python --version
 
 Si la versión de Anaconda es la 2.7.14 todo ha ido bien, sino revisa el proceso!
 
-** Hora y Editor por Defecto
+**Hora y Editor por Defecto**
 
 ```
 cd
@@ -56,7 +56,7 @@ EOF
 source $HOME/.bash_profile
 ```
 
-** Spark
+**Spark**
 
 ```
 sudo ln -s /usr/lib/hive/conf/hive-site.xml /usr/lib/spark/conf/hive-site.xml
