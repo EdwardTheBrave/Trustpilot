@@ -1,4 +1,4 @@
-# Mi primer proyecto: Trustpilot
+# Mi primer proyecto de Big Data: Trustpilot
 
 En este proyecto se pretende facilitar el código necesario para descargar las valoraciones de los usuarios de tu empresa en Trustpilot, ingestarlas en HDFS, estructurarlas con Spark y utilizar una herramienta de visualización como Tableau para visualizar los datos a través de Impala. Se trata de mi primer mini proyecto de Big Data completo desde la extracción de datos hasta la visualización, sed benévolos!.
 
