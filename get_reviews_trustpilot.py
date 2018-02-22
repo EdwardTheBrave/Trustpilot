@@ -9,7 +9,6 @@ def get_reviews(headers, params):
 def writeToJSONFile(path, fileName, data):
     filePathNameWExt = '/' + path + '/' + fileName + '.json'
     with open(filePathNameWExt, 'a') as fp:
-
         json.dump(data, fp)
         fp.write('\n')
 
@@ -25,7 +24,9 @@ headers = {
 
 response = requests.request("POST", url, data=payload, headers=headers)
 
-#print(response.text) - Ejecutar este comando para visualizar la respuesta y seleccionar como token el campo "acces token".
+token_json = json.loads(response.text)
+token = token_json["access_token"]
+
 
 
 """Ahora procedemos a solicitar todas las valoraciones"""
@@ -33,7 +34,7 @@ response = requests.request("POST", url, data=payload, headers=headers)
 pre_total = []
 
 url = "https://api.trustpilot.com/v1/private/business-units/<Id de tu empresa o business unit ID>/reviews"
-querystring = {"token":"<token obtenido con la petición anterior>","perPage":"1", "page":"1", "orderBy":"createdat.desc"}
+querystring = {token,"perPage":"1", "page":"1", "orderBy":"createdat.desc"}
 header = {
     'authorization': "Basic <API Key + Secret Key de la empresa cifradas en Base64>",
     'cache-control': "no-cache",

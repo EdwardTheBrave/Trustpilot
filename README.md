@@ -6,20 +6,21 @@ Algunos datos (los mínimos necesarios) han sido suprimidos por motivos de confi
 
 Todo el ejercicio se desarrolla dentro de la máquina virtual de Cloudera CDH 5, no obstante, si se dispone de las herramientas necesarias se podrá ejecutar en cualquier entorno real de Big Data.
 
-¡Comencemos!
+** ¡Comencemos!
 
 Herramientas y software que necesitaremos:
 
-- Python (es posible que tengas que actualizar la versión si algo no funciona pero no debería ser necesario)
-- Spark
-- Hive2
-.
-.
-.
+* Python (es posible que tengas que actualizar la versión si algo no funciona pero no debería ser necesario)
+* Spark
+* Hive2
+* Impala
+* Tableau
 
 Primero, un poco de configuración básica de la máquina de la mano de @dvillaj (ignora este paso si trabajas con software actualizado y un entorno real de Big Data, seguramente tengas todo lo necesario).
 
-Instalación de Python
+## Configuración Previa
+
+** Instalación de Python
 
 
 ````
@@ -40,7 +41,7 @@ python --version
 
 Si la versión de Anaconda es la 2.7.14 todo ha ido bien, sino revisa el proceso!
 
-Hora y Editor por Defecto
+** Hora y Editor por Defecto
 
 ```
 cd
@@ -55,7 +56,7 @@ EOF
 source $HOME/.bash_profile
 ```
 
-Spark
+** Spark
 
 ```
 sudo ln -s /usr/lib/hive/conf/hive-site.xml /usr/lib/spark/conf/hive-site.xml
@@ -66,6 +67,8 @@ sudo sed -i 's/log4j.rootCategory=INFO/log4j.rootCategory=WARN/' \
 ```
 
 
+## ETL de los datos
+
 ¡Ahora sí, comienza lo divertido!
 
 Primero, vamos a clonar este repositorio en la máquina virtual para ahorrarnos los pasos de crear algunos directorios. 
@@ -73,28 +76,15 @@ Primero, vamos a clonar este repositorio en la máquina virtual para ahorrarnos 
 ```
 cd
 git clone https://github.com/EdwardTheBrave/trustpilot
-
 ```
 
-Puedes comprobar si todo ha ido bien situándote en tu directorio de usuario y ejecutando el comando "ls". Si ha aparecido el directorio "Trustpilot" vas por buen camino. Explóralo accediendo a él y comprueba que tiene los mismos archivos que en la web. A continuación accedemos al directorio y nos aseguramos de que los ejecutables tienen los permisos necesarios para ejecutarse.
-
-```
-cd
-cd trustpilot/
-
-chmod a+x get_reviews_trustpilot.py
-chmod a+x show_struct.py
-chmod a+x reviews.py
-chmod a+x tabla.hql
-
-ls
-```
-
-Ahora deberían aparecer todos los ficheros de la carpeta con el mismo color (el que tenga tu consola configurado como ejecutable).
+Puedes comprobar si todo ha ido bien situándote en tu directorio de usuario y ejecutando el comando "ls". Si ha aparecido el directorio "Trustpilot" vas por buen camino. Explóralo accediendo a él y comprueba que tiene los mismos archivos que en la web.
 
 Para continuar vamos a modificar el script de get_reviews_trustpilot.py para introducir en él los datos de nuestra empresa que comentaba al principio, y que han sido suprimidos por motivos de confidencialidad y privacidad. Para ello primero accedemos al script en modo edición.
 
 ```
+cd
+cd trustpilot/
 nano get_reviews_python.py
 ```
 
@@ -104,11 +94,10 @@ Modificamos dentro del script las siguientes líneas de comando con la informaci
 1. payload = "grant_type=password&username=<email de un usuario de la empresa con acceso a Trustpilot Business>&password=<contraseña de ese usuario>"
 2. 'Authorization': "Basic <API Key + Secret Key de la empresa cifradas en Base64>",
 3. url = "https://api.trustpilot.com/v1/private/business-units/<Id de tu empresa o business unit ID>/reviews"
-4. querystring = {"token":"<token obtenido con la petición anterior>","perPage":"1", "page":"1", "orderBy":"createdat.desc"}
-5. 'authorization': "Basic <API Key + Secret Key de la empresa cifradas en Base64>",
+4. 'authorization': "Basic <API Key + Secret Key de la empresa cifradas en Base64>",
 ```
 
-Una vez tengas los datos, sal del con el comando "ctr+X", indicando que sí deseas guardar los cambios y manteniendo el nombre del fichero.
+Una vez tengas los datos, sal del fichero con el comando "ctr+X", indicando que sí deseas guardar los cambios y manteniendo el nombre del fichero.
 
 Estamos listos para ejecutar el primer script. Para ello, ejecutamos la siguiente línea y esperamos (ten en cuenta que revisa todas las valoraciones una a una por lo que si tu empresa tiene muchas puede tardar un poco).
 
@@ -121,6 +110,7 @@ Si ejecutamos el comando "ls" veremos que se ha creado un nuevo fichero con el n
 ```
 hadoop fs -mkdir -p /raw/json
 hadoop fs -mkdir -p /raw/reviews
+hadoop fs -mkdir -p /raw/cloud
 
 hadoop fs -put <nombre del fichero a ingestar> /raw/json
 ```
@@ -143,7 +133,7 @@ Si todo está en orden, procedemos a crear la tabla con la información que hemo
 
 Primera forma:
 ```
-beeline -u jdbc:hive2:// -f tabla.hql
+beeline -u jdbc:hive2:// -f tabla_total.hql
 ```
 
 Segunda forma: Para el caso de que la primera forma de error, o nos sea dificil de comprender, yo recomiendo abrir el navegador y acceder a HUE. HUE se accede poniendo en la URL "localhost:8888". En la pantalla de login introduces usuario y contraseña, en nuestro caso ambos son "cloudera". Por defecto vendrá la versión 4, cambiamos a la versión 3 y abirmos el editor de querys de Hive. En este editor copiamos el contenido del fichero tabla.hql:
@@ -177,3 +167,37 @@ Una vez hecho esto nos debe de haber aparecido una nueva tabla a la izquierda co
 ```
 select * from reviews limit 30;
 ```
+
+A continuación, necesitamos procesar los datos del json de nuevo para poder crear otra tabla diferente que utilizaremos a la hora de visualizar. Como haremos una nube de palabras con las palabras más repetidas de los clientes en sus valoraciones, vamos a crear una tabla externa que contenga una única columna con todas las palabras como valores. Para ello, repetimos el proceso. Acudimos a la consola y ejecutamos:
+
+```
+cd
+cd trustpilot/
+
+spark-submit reviews_cloud.py
+
+hadoop fs -ls /raw/cloud
+```
+
+Creamos la tabla:
+
+Primera forma (desde la consola):
+```
+beeline -u jdbc:hive2:// -f tabla_cloud.hql
+```
+
+Segunda forma (desde Hive en HUE):
+```
+DROP TABLE IF EXISTS cloud;
+
+CREATE EXTERNAL TABLE cloud (
+    word string
+)
+ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
+ STORED AS
+ INPUTFORMAT 'parquet.hive.DeprecatedParquetInputFormat'
+ OUTPUTFORMAT 'parquet.hive.DeprecatedParquetOutputFormat'
+LOCATION '/raw/cloud';
+```
+
+Llegados a este punto, tenemos toda la información procesada y las tablas externas creadas. Pódríamos explorar los datos mediante consultas SQL tanto con Hive como con Impala. Lo último que queda por hacer es sacar valor a los datos. Para ello, vamos a conectar Tableau con Impala para poder hacer un pequeño dashboard con los datos más importantes.
