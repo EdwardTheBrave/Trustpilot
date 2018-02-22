@@ -6,7 +6,7 @@ Algunos datos (los mínimos necesarios) han sido suprimidos por motivos de confi
 
 Todo el ejercicio se desarrolla dentro de la máquina virtual de Cloudera CDH 5, no obstante, si se dispone de las herramientas necesarias se podrá ejecutar en cualquier entorno real de Big Data.
 
-** ¡Comencemos!
+**¡Comencemos!
 
 Herramientas y software que necesitaremos:
 
