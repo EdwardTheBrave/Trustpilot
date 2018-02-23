@@ -193,4 +193,16 @@ ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
 LOCATION '/raw/cloud';
 ```
 
-Llegados a este punto, tenemos toda la información procesada y las tablas externas creadas. Pódríamos explorar los datos mediante consultas SQL tanto con Hive como con Impala. Lo último que queda por hacer es sacar valor a los datos. Para ello, vamos a conectar Tableau con Impala para poder hacer un pequeño dashboard con los datos más importantes.
+Llegados a este punto, tenemos toda la información procesada y las tablas externas creadas. Pódríamos explorar los datos mediante consultas SQL tanto con Hive como con Impala. Para tener las tablas disponibles en Impala solo debemos cambiar a esta herramienta en HUE y actualizar la base de datos y los metadatos. Lo último que queda por hacer es sacar valor a los datos. Para ello, vamos a conectar Tableau con Impala para poder hacer un pequeño dashboard con los datos más importantes.
+
+## Visualización
+
+Por último, he utilizado un software de visualización de los más potentes en la actualidad según el último Cuadrante Mágico de Gartner, Tableau. En su versión Deskpot 10.5 podemos conectar directamente con impala. Para ello, elegiremos de entre sus conectores Hadoop Cloudera, y seleccionaremos la siguiente configuración (siempre y cuando estéis con la máquina virtual de claudera claro, sino deberéis seleccionar la vuestra propia).
+
+* Servidor: 127.0.0.1
+* Puerto: 21050
+* Tipo: Impala
+* Autenticación: Nombre de Usuario y Contraseña
+* Nombre de usuario & Contraseña: cloudera
+
+Con esto habremos establecido la conexión y ya podremos usar la herramienta para hacer los gráficos que queramos.
