@@ -205,4 +205,12 @@ Por último, he utilizado un software de visualización de los más potentes en 
 * Autenticación: Nombre de Usuario y Contraseña
 * Nombre de usuario & Contraseña: cloudera
 
-Con esto habremos establecido la conexión y ya podremos usar la herramienta para hacer los gráficos que queramos.
+Con esto habremos establecido la conexión y ya podremos usar la herramienta para hacer los gráficos que queramos. A continuación muestro de forma simple una nube de palabras con las palabras más repetidas de los usuarios y un pequeños dashboard con los datos generales extraídos, para ver una posible aplicación de cada una de las funcionalidades.
+
+![alt text]
+(https://github.com/EdwardTheBrave/trustpilot/blob/trustpilot/images/Cloud.png)
+
+![alt text]
+(https://github.com/EdwardTheBrave/trustpilot/blob/trustpilot/images/Dashboard.png)
+
+¡Gracias por vuestro tiempo! Para cualquier duda, mi mail es eduardobravogarcia@gmail.com
