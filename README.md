@@ -1,6 +1,6 @@
 # Mi primer proyecto de Big Data: Trustpilot
 
-En este proyecto se pretende facilitar el código necesario para descargar las valoraciones de los usuarios de tu empresa en Trustpilot, ingestarlas en HDFS, estructurarlas con Spark y utilizar una herramienta de visualización como Tableau para visualizar los datos a través de Impala. Se trata de mi primer mini proyecto de Big Data completo desde la extracción de datos hasta la visualización, sed benévolos!.
+En este proyecto se pretende facilitar el código necesario para descargar las valoraciones de los usuarios de tu empresa en Trustpilot, ingestarlas en HDFS, estructurarlas con Spark y utilizar una herramienta de visualización como Tableau para visualizar los datos a través de Impala. Se trata de mi primer mini proyecto de Big Data completo desde la extracción de datos hasta la visualización, ¡sed benévolos!.
 
 Algunos datos (los mínimos necesarios) han sido suprimidos por motivos de confidencialidad y privacidad de la empresa. Datos tales como el API key, Secret Key, Token, etc. deberán sustituirse por los de la empresa con la que se quiera replicar este código para obtener sus propias valoraciones. No obstante, se avisará durante todo el proceso cuando sea necesario sustituir algún dato y este vendrá indicado en el código entre <>.
 
@@ -11,6 +11,7 @@ Todo el ejercicio se desarrolla dentro de la máquina virtual de Cloudera CDH 5,
 Herramientas y software que necesitaremos:
 
 * Python (es posible que tengas que actualizar la versión si algo no funciona pero no debería ser necesario)
+* HDFS
 * Spark
 * Hive2
 * Impala
@@ -71,24 +72,14 @@ sudo sed -i 's/log4j.rootCategory=INFO/log4j.rootCategory=WARN/' \
 
 ¡Ahora sí, comienza lo divertido!
 
-Primero, vamos a clonar este repositorio en la máquina virtual para ahorrarnos los pasos de crear algunos directorios. 
+Primero, vamos a clonar este repositorio en la máquina virtual para ahorrarnos los pasos de crear algunos directorios. Puedes comprobar si todo ha ido bien situándote en tu directorio de usuario y ejecutando el comando "ls". Si ha aparecido el directorio "Trustpilot" vas por buen camino. Explóralo accediendo a él y comprueba que tiene los mismos archivos que en la web.
 
 ```
 cd
 git clone https://github.com/EdwardTheBrave/trustpilot
 ```
 
-Puedes comprobar si todo ha ido bien situándote en tu directorio de usuario y ejecutando el comando "ls". Si ha aparecido el directorio "Trustpilot" vas por buen camino. Explóralo accediendo a él y comprueba que tiene los mismos archivos que en la web.
-
-Para continuar vamos a modificar el script de get_reviews_trustpilot.py para introducir en él los datos de nuestra empresa que comentaba al principio, y que han sido suprimidos por motivos de confidencialidad y privacidad. Para ello primero accedemos al script en modo edición.
-
-```
-cd
-cd trustpilot/
-nano get_reviews_python.py
-```
-
-Modificamos dentro del script las siguientes líneas de comando con la información pertinente en cada una (te las muestro a continuación para que no te dejes ninguna):
+Para continuar vamos a modificar el script de get_reviews_trustpilot.py para introducir en él los datos de nuestra empresa que comentaba al principio, y que han sido suprimidos por motivos de confidencialidad y privacidad. Para ello primero accedemos al script en modo edición. Modificamos dentro del script las siguientes líneas de comando con la información pertinente en cada una (te las muestro a continuación para que no te dejes ninguna):
 
 ```
 1. payload = "grant_type=password&username=<email de un usuario de la empresa con acceso a Trustpilot Business>&password=<contraseña de ese usuario>"
@@ -136,7 +127,9 @@ Primera forma:
 beeline -u jdbc:hive2:// -f tabla_total.hql
 ```
 
-Segunda forma: Para el caso de que la primera forma de error, o nos sea dificil de comprender, yo recomiendo abrir el navegador y acceder a HUE. HUE se accede poniendo en la URL "localhost:8888". En la pantalla de login introduces usuario y contraseña, en nuestro caso ambos son "cloudera". Por defecto vendrá la versión 4, cambiamos a la versión 3 y abirmos el editor de querys de Hive. En este editor copiamos el contenido del fichero tabla.hql:
+Segunda forma: 
+
+Para el caso de que la primera forma de error, o nos sea dificil de comprender, yo recomiendo abrir el navegador y acceder a HUE. HUE se accede poniendo en la URL "localhost:8888". En la pantalla de login introduces usuario y contraseña, en nuestro caso ambos son "cloudera". Por defecto vendrá la versión 4, cambiamos a la versión 3 y abirmos el editor de querys de Hive. En este editor copiamos el contenido del fichero tabla.hql:
 
 ```
 DROP TABLE IF EXISTS reviews;
