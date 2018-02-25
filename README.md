@@ -1,27 +1,27 @@
-# Mi primer proyecto de Big Data: Trustpilot
+# My first Big Data project: Trustpilot at a glance
 
-En este proyecto se pretende facilitar el código necesario para descargar las valoraciones de los usuarios de tu empresa en Trustpilot, ingestarlas en HDFS, estructurarlas con Spark y utilizar una herramienta de visualización como Tableau para visualizar los datos a través de Impala. Se trata de mi primer mini proyecto de Big Data completo desde la extracción de datos hasta la visualización, ¡sed benévolos!.
+The aim of this project is to facilitate the necessary code to download your customers' reviews from Trustpilot, intake them in HDFS, struct them with Spark and use Tableau as a visualization tool to visualize the data through Impala. It is my first complete small Big Data project from the data extraction to the data visualization, don't be so hard!
 
-Algunos datos (los mínimos necesarios) han sido suprimidos por motivos de confidencialidad y privacidad de la empresa. Datos tales como el API key, Secret Key, Token, etc. deberán sustituirse por los de la empresa con la que se quiera replicar este código para obtener sus propias valoraciones. No obstante, se avisará durante todo el proceso cuando sea necesario sustituir algún dato y este vendrá indicado en el código entre <>.
+Some information (just the indispensable) has been deleted due to privacy and confidential reasons. Relevant data as the API key, Secret Key, etc. must be replaced with your Company information about which you want to reply this exercise. However, you will be notified whenever you need to change any ditto. Said changes will be indicated with the use of <>.
 
-Todo el ejercicio se desarrolla dentro de la máquina virtual de Cloudera CDH 5, no obstante, si se dispone de las herramientas necesarias se podrá ejecutar en cualquier entorno real de Big Data.
+This whole exercise take place under the virtual machine Cloudera CDH 5 environment. Nevertheless, if you have the necessary tools you will be able to implement it in any real Big Data ecosystem.
 
-**¡Comencemos!**
+**Let's start!**
 
-Herramientas y software que necesitaremos:
+Necessary software and tools:
 
-* Python (es posible que tengas que actualizar la versión si algo no funciona pero no debería ser necesario)
+* Python (you may need to update your version if something does not work properly but this is pretty unlikely)
 * HDFS
 * Spark
 * Hive2
 * Impala
 * Tableau
 
-Primero, un poco de configuración básica de la máquina de la mano de @dvillaj (ignora este paso si trabajas con software actualizado y un entorno real de Big Data, seguramente tengas todo lo necesario).
+## Previous Configuration
 
-## Configuración Previa
+First of all, a little bit of basic configuration on the virtual machina, provided by @dvillaj (ignore this step if you work with updated software and a real Big Data environment, you will probably have all the necessary tools updated)
 
-**Instalación de Python**
+**Installing Python**
 
 
 ````
@@ -40,9 +40,9 @@ source $HOME/.bashrc
 python --version
 ````
 
-Si la versión de Anaconda es la 2.7.14 todo ha ido bien, sino revisa el proceso!
+If the resulting Anaconda version is 2.7.14 you did it great, otherwise have a look at the process again!
 
-**Hora y Editor por Defecto**
+**Default Time Zone and Editor**
 
 ```
 cd
@@ -68,18 +68,18 @@ sudo sed -i 's/log4j.rootCategory=INFO/log4j.rootCategory=WARN/' \
 ```
 
 
-## ETL de los datos
+## Data ETL
 
-¡Ahora sí, comienza lo divertido!
+Okay, now we can start with the fun!
 
-Primero, vamos a clonar este repositorio en la máquina virtual para ahorrarnos los pasos de crear algunos directorios. Puedes comprobar si todo ha ido bien situándote en tu directorio de usuario y ejecutando el comando "ls". Si ha aparecido el directorio "Trustpilot" vas por buen camino. Explóralo accediendo a él y comprueba que tiene los mismos archivos que en la web.
+First, we will clone this repository in the virtual machine in order to save some steps like creating directories. You may check if everything is allright by executing the "ls" command in your home directory. If you now have the "Trusstpilot" directory you are on the right path. Explorre it and check if it has the same files you see on the web.
 
 ```
 cd
 git clone https://github.com/EdwardTheBrave/trustpilot
 ```
 
-Para continuar vamos a modificar el script de get_reviews_trustpilot.py para introducir en él los datos de nuestra empresa que comentaba al principio, y que han sido suprimidos por motivos de confidencialidad y privacidad. Para ello primero accedemos al script en modo edición. Modificamos dentro del script las siguientes líneas de comando con la información pertinente en cada una (te las muestro a continuación para que no te dejes ninguna):
+Now, we need to modify the get_reviews_trustpilot.py script to set your Company details mentioned at the beginning of this post. In order to do this, access the script in edition mode. Change the applicable information with the one of your Company. Here I detail you all the lines to be changed so you do not miss any of them:
 
 ```
 1. payload = "grant_type=password&username=<email de un usuario de la empresa con acceso a Trustpilot Business>&password=<contraseña de ese usuario>"
@@ -88,15 +88,15 @@ Para continuar vamos a modificar el script de get_reviews_trustpilot.py para int
 4. 'authorization': "Basic <API Key + Secret Key de la empresa cifradas en Base64>",
 ```
 
-Una vez tengas los datos, sal del fichero con el comando "ctr+X", indicando que sí deseas guardar los cambios y manteniendo el nombre del fichero.
+Once you finish it, exit from the file saving the changes.
 
-Estamos listos para ejecutar el primer script. Para ello, ejecutamos la siguiente línea y esperamos (ten en cuenta que revisa todas las valoraciones una a una por lo que si tu empresa tiene muchas puede tardar un poco).
+We are ready to run the first script. To do so, execute the following line and wait (take into account that this script goes through all your Company's reviews one at a time, so be patient).
 
 ```
 python get_reviews_trustpilot.py
 ```
 
-Si ejecutamos el comando "ls" veremos que se ha creado un nuevo fichero con el nombre trustpilot_reviews_%%% donde %%% son las tres primeras letras del día de la semana en que lo has ejecutado. Lo siguiente que tenemos que hacer es crear en hadoop los directorios que vamos a utilizar e ingestar el fichero creado en hdfs, para ello:
+If you run the "ls" command you will see a new file has appeared with the following name structure "trustpilot_reviews_%%%", where %%% are the first three letters of the day of the week in which you are runing this script. The next thing to do is creating the directories of hadoop in which we will intake the file generated, to do so:
 
 ```
 hadoop fs -mkdir -p /raw/json
@@ -106,13 +106,13 @@ hadoop fs -mkdir -p /raw/cloud
 hadoop fs -put <nombre del fichero a ingestar> /raw/json
 ```
 
-De forma opcional, si se quisiera consultar la estructura del fichero y comprobar que la API de Trustpilot nos ha devuelto un JSON bien estructurado podemos ejecutar el script de show_struct con Spark.
+Optionally, if you want to check the structure of the file and check if the Trustpilot API has sent back the right response (a well structured JSON) we can run the show_struct.py script with Spark:
 
 ```
 spark-submit show_struct.py
 ```
 
-Continuamos, ya tenemos el fichero ingestado en el entorno hdfs. Sin embargo, el JSON que devuelve la API de Trustpilot es algo enreversado como para tratarlo directamente con hive tal y como está. Para limpiarlo un poco y poder crear las tablas más tarde, utilizamos el script de reviews. Además, comprobamos que el directorio de hadoop que hemos creado como /raw/reviews almacene el fichero de SUCCESS y los ficheros formato Parquet 
+To continue, we already have the file intaken in HDFS. However, the JSON response has a complex structure and cannot be processed with hive. We will use the reviews.py script to clean the JSON and be able to create the necessary tables. Additionally, we check that the /raw/reviews directory stores a success file and the rest of the files in Parquet format.
 
 ```
 spark-submit reviews.py
@@ -120,16 +120,16 @@ spark-submit reviews.py
 hadoop fs -ls /raw/reviews
 ```
 
-Si todo está en orden, procedemos a crear la tabla con la información que hemos extraído en Hive. Para ello podemos hacerlo de dos maneras:
+If everything is allright, we proceed to create the table with the extracted information in Hive. We can do it with two different approaches:
 
-Primera forma:
+First approach:
 ```
-beeline -u jdbc:hive2:// -f tabla_total.hql
+beeline -u jdbc:hive2:// -f table_total.hql
 ```
 
-Segunda forma: 
+Second approach: 
 
-Para el caso de que la primera forma de error, o nos sea dificil de comprender, yo recomiendo abrir el navegador y acceder a HUE. HUE se accede poniendo en la URL "localhost:8888". En la pantalla de login introduces usuario y contraseña, en nuestro caso ambos son "cloudera". Por defecto vendrá la versión 4, cambiamos a la versión 3 y abirmos el editor de querys de Hive. En este editor copiamos el contenido del fichero tabla.hql:
+If you get an error with the first approach, or if you find it more difficult to understand or control, I suggest opening the browser and accessing to HUE. You can access HUE (with the virtual machine runing) by introducing the folowwing URL: "localhost:8888". In the login screen enter your user and password, noth of them are "cloudera" in our example. Change to the 3th version of HUE and open the queries editor of Hive. Copy the table.hql content and run it:
 
 ```
 DROP TABLE IF EXISTS reviews;
@@ -155,13 +155,14 @@ ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
 LOCATION '/json/reviews';
 ```
 
-Una vez hecho esto nos debe de haber aparecido una nueva tabla a la izquierda con las columnas que aparecen en el script de arriba. Ahora, si ejecutamos cualquier query de SQL debería devolver el resultado de la query sin errores. Para ver la estructura mejor prueba a introducir en Hive:
+Once we have done that, there must have appeared a new table on the left pannel of the screen. Now, if you run any SQL query it should return the answer without errors. In order to appreciate the table structure, run:
 
 ```
 select * from reviews limit 30;
 ```
 
-A continuación, necesitamos procesar los datos del json de nuevo para poder crear otra tabla diferente que utilizaremos a la hora de visualizar. Como haremos una nube de palabras con las palabras más repetidas de los clientes en sus valoraciones, vamos a crear una tabla externa que contenga una única columna con todas las palabras como valores. Para ello, repetimos el proceso. Acudimos a la consola y ejecutamos:
+
+To continue, we need to process the JSON information to create another table that we will use for the visualization. We will make a 'word cloud' with the words of the reviews with higher frequency. To do so, we repeat the process. Access the shell and run:
 
 ```
 cd
@@ -172,14 +173,14 @@ spark-submit reviews_cloud.py
 hadoop fs -ls /raw/cloud
 ```
 
-Creamos la tabla:
+We create the table:
 
-Primera forma (desde la consola):
+First approach (on the shell):
 ```
-beeline -u jdbc:hive2:// -f tabla_cloud.hql
+beeline -u jdbc:hive2:// -f table_cloud.hql
 ```
 
-Segunda forma (desde Hive en HUE):
+Second approach (from Hive on HUE):
 ```
 DROP TABLE IF EXISTS cloud;
 
@@ -193,22 +194,23 @@ ROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'
 LOCATION '/raw/cloud';
 ```
 
-Llegados a este punto, tenemos toda la información procesada y las tablas externas creadas. Pódríamos explorar los datos mediante consultas SQL tanto con Hive como con Impala. Para tener las tablas disponibles en Impala solo debemos cambiar a esta herramienta en HUE y actualizar la base de datos y los metadatos. Lo último que queda por hacer es sacar valor a los datos. Para ello, vamos a conectar Tableau con Impala para poder hacer un pequeño dashboard con los datos más importantes.
+It is at this point that we have all the information processed and the tables created. In order to have the tables available in Impala, we just need to change to the Impala editor in HUE and update the database and metadata. The last thing to do is make some value from the data. In order to do that, we will connect Tableau with Impala to make a small dashboard with the most relevant information.
 
-## Visualización
+## Visualization
 
-Por último, he utilizado un software de visualización de los más potentes en la actualidad según el último Cuadrante Mágico de Gartner, Tableau. En su versión Deskpot 10.5 podemos conectar directamente con impala. Para ello, elegiremos de entre sus conectores Hadoop Cloudera, y seleccionaremos la siguiente configuración (siempre y cuando estéis con la máquina virtual de claudera claro, sino deberéis seleccionar la vuestra propia).
+Lastly, I have used one of the most powerful visualization softwares according to the last Gartner Magic Quadrant, Tableau. In its 10.5 version, we can directly connect it with Impala. Before you try the conection, you must download and install in your computer an ODBC Impala client, find the software and installing instructions in the following link (https://www.cloudera.com/downloads/connectors/impala/odbc/2-5-41.html).
 
-* Servidor: 127.0.0.1
-* Puerto: 21050
-* Tipo: Impala
-* Autenticación: Nombre de Usuario y Contraseña
-* Nombre de usuario & Contraseña: cloudera
+To stablish the connection, we will choose "Hadoop Cloudera" amongst its possible conections, and configure the following settings (as long as you are using the cloudera virtual machine):
+* Server: 127.0.0.1
+* Host: 21050
+* Type: Impala
+* Authentication: Username & Password
+* Username & Password: cloudera
 
-Con esto habremos establecido la conexión y ya podremos usar la herramienta para hacer los gráficos que queramos. A continuación muestro de forma simple una nube de palabras con las palabras más repetidas de los usuarios y un pequeños dashboard con los datos generales extraídos, para ver una posible aplicación de cada una de las funcionalidades.
+With that done, we will have stablished the conection and we will be able to use Tableau to make any graphs we want. Here I show you an easy way to visualize your customers reviews with a 'word cloud' and a small dashboard with the information extracted from the API so you can see one of the many possible applications for this repository.
 
 ![alt text](https://github.com/EdwardTheBrave/trustpilot/blob/trustpilot/images/Cloud.png)
 
 ![alt text](https://github.com/EdwardTheBrave/trustpilot/blob/trustpilot/images/Dashboard.png)
 
-¡Gracias por vuestro tiempo! Para cualquier duda, mi mail es eduardobravogarcia@gmail.com
+Thank you for your time! For any doubt, my email address is eduardobravogarcia@gmail.com
