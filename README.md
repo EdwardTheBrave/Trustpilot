@@ -19,7 +19,7 @@ Necessary software and tools:
 
 ## Previous Configuration
 
-First of all, a little bit of basic configuration on the virtual machina, provided by @dvillaj (ignore this step if you work with updated software and a real Big Data environment, you will probably have all the necessary tools updated)
+First of all, a little bit of basic configuration on the virtual machine, provided by @dvillaj (ignore this step if you work with updated software and a real Big Data environment, you will probably have all the necessary tools updated)
 
 **Installing Python**
 
@@ -72,7 +72,7 @@ sudo sed -i 's/log4j.rootCategory=INFO/log4j.rootCategory=WARN/' \
 
 Okay, now we can start with the fun!
 
-First, we will clone this repository in the virtual machine in order to save some steps like creating directories. You may check if everything is allright by executing the "ls" command in your home directory. If you now have the "Trusstpilot" directory you are on the right path. Explorre it and check if it has the same files you see on the web.
+First, we will clone this repository in the virtual machine in order to save some steps like creating directories. You may check if everything is allright by executing the "ls" command in your home directory. If you now have the "Trustpilot" directory you are on the right path. Explorre it and check if it has the same files you see on the web.
 
 ```
 cd
